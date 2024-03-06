@@ -7,9 +7,8 @@ BEGIN
     SELECT 1 INTO existing_id
     FROM STUDENTS
     WHERE ID = :NEW.ID;
-
     IF existing_id IS NOT NULL THEN
-        RAISE_APPLICATION_ERROR(-20001, '??????? ? ????? ID ??? ??????????');
+        RAISE_APPLICATION_ERROR(-20001, 'STUDENT WITH THIS ID ALREADY EXISTS');
     END IF;
 END;
 /
@@ -25,7 +24,7 @@ BEGIN
     WHERE ID = :NEW.ID;
 
     IF existing_id IS NOT NULL THEN
-        RAISE_APPLICATION_ERROR(-20002, '?????? ? ????? ID ??? ??????????');
+        RAISE_APPLICATION_ERROR(-20002, 'GROUP WITH THIS ID ALREADY EXISTS');
     END IF;
 END;
 /
@@ -51,7 +50,7 @@ BEGIN
     WHERE NAME = :NEW.NAME;
 
     IF existing_name IS NOT NULL THEN
-        RAISE_APPLICATION_ERROR(-20003, '?????? ? ????? ?????? ??? ??????????');
+        RAISE_APPLICATION_ERROR(-20003, 'GROUP WITH THIS NAME ALREADY EXISTS');
     END IF;
 END;
 /
