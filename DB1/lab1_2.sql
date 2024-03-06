@@ -1,15 +1,13 @@
 DECLARE
-  v_id NUMBER;
-  v_val NUMBER;
+    var_id NUMBER;
+    var_val NUMBER;
 BEGIN
-  FOR i IN 1..10000 LOOP
+    FOR i IN 1..10000 LOOP
+        var_id := i;
+        var_val := ROUND(DBMS_RANDOM.VALUE(1, 100));
 
-    v_id := DBMS_RANDOM.VALUE(1, 10000);
-    v_val := DBMS_RANDOM.VALUE;
-
-    INSERT INTO MyTable (id, val) VALUES (ROUND(v_id), v_val);
-  END LOOP;
-  
-  COMMIT; 
+        INSERT INTO MyTable (id, val) VALUES (var_id, var_val);
+    END LOOP;
 END;
 /
+Select * from MyTable ORDER BY id;  
