@@ -1,0 +1,13 @@
+CREATE OR REPLACE TRIGGER CASCADE_DELETE_STUDENTS
+AFTER DELETE ON GROUPS
+FOR EACH ROW
+BEGIN
+    DELETE FROM STUDENTS WHERE GROUP_ID = :OLD.ID;
+END;
+/
+
+Select * from groups;
+delete from groups where id = 1;
+select * from students;
+
+
