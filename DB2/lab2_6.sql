@@ -1,0 +1,26 @@
+CREATE OR REPLACE TRIGGER trigger_update_c_val
+AFTER INSERT OR UPDATE OR DELETE ON STUDENTS
+FOR EACH ROW
+BEGIN
+    IF INSERTING THEN
+        UPDATE GROUPS
+        SET C_VAL = C_VAL +1
+        WHERE ID = :NEW.GROUP_ID;
+    END IF;
+    
+    IF UPDATING THEN
+        UPDATE GROUPS
+        SET C_VAL = C_VAL + 1
+        WHERE ID = :NEW.GROUP_ID;
+        
+        UPDATE GROUPS
+        SET C_VAL = C_VAL - 1
+        WHERE ID = :OLD.GROUP_ID;
+    END IF;
+    
+    IF DELETING THEN
+        UPDATE GROUPS
+        SET C_VAL = C_VAL - 1
+        WHERE ID = :OLD.GROUP_ID;
+    END IF;
+END;

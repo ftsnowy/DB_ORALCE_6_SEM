@@ -1,64 +1,97 @@
-CREATE OR REPLACE TRIGGER CHECK_UNIQUE_ID
+CREATE OR REPLACE TRIGGER trigger_unique_id_students
 BEFORE INSERT ON STUDENTS
 FOR EACH ROW
 DECLARE
-    existing_id NUMBER;
+    v_count NUMBER;
 BEGIN
-    SELECT 1 INTO existing_id
+    SELECT COUNT(*)
+    INTO v_count
     FROM STUDENTS
     WHERE ID = :NEW.ID;
-
-    IF existing_id IS NOT NULL THEN
-        RAISE_APPLICATION_ERROR(-20001, 'STUDENT WITH THIS ID ALREADY EXISTS');
+    
+    IF v_count > 0 THEN
+        RAISE_APPLICATION_ERROR(-20001, 'STUDENT ID MUST BE UNIQUE');
     END IF;
-EXCEPTION
-    WHEN NO_DATA_FOUND THEN
-        NULL;
 END;
 /
-CREATE OR REPLACE TRIGGER check_unique_id_groups
+
+CREATE OR REPLACE TRIGGER trigger_unique_id_groups
 BEFORE INSERT ON GROUPS
 FOR EACH ROW
 DECLARE
-    existing_id NUMBER;
+    v_count NUMBER;
 BEGIN
-    SELECT 1 INTO existing_id
+    SELECT COUNT(*)
+    INTO v_count
     FROM GROUPS
     WHERE ID = :NEW.ID;
-
-    IF existing_id IS NOT NULL THEN
-        RAISE_APPLICATION_ERROR(-20002, 'GROUP WITH THIS ID ALREADY EXISTS');
+    
+    IF v_count > 0 THEN
+        RAISE_APPLICATION_ERROR(-20002, 'GROUP ID MUST BE UNIQUE');
     END IF;
-EXCEPTION
-    WHEN NO_DATA_FOUND THEN
-        NULL;
 END;
 /
 
-CREATE SEQUENCE STUDENTS_SEQ START WITH 1 INCREMENT BY 1;
 
-CREATE OR REPLACE TRIGGER generate_student_id
+CREATE OR REPLACE TRIGGER trigger_autoincrement_students_id
 BEFORE INSERT ON STUDENTS
 FOR EACH ROW
+DECLARE
+    v_id NUMBER;
 BEGIN
-    :NEW.ID := STUDENTS_SEQ.NEXTVAL;
+    IF :NEW.ID IS NULL THEN
+    
+        SELECT MAX(ID)
+        INTO v_id
+        FROM STUDENTS;
+        
+        IF v_id IS NULL THEN
+            :NEW.ID :=1;
+        ELSE
+            :NEW.ID :=v_id + 1;
+        END IF;
+    END IF;
 END;
 /
 
-CREATE OR REPLACE TRIGGER check_unique_group_name
+CREATE OR REPLACE TRIGGER trigger_autoincrement_groups_id
 BEFORE INSERT ON GROUPS
 FOR EACH ROW
 DECLARE
-    existing_name NUMBER;
+    v_id NUMBER;
 BEGIN
-    SELECT 1 INTO existing_name
+    IF :NEW.ID IS NULL THEN
+    
+        SELECT MAX(ID)
+        INTO v_id
+        FROM GROUPS;
+        
+        IF v_id IS NULL THEN
+            :NEW.ID :=1;
+        ELSE
+            :NEW.ID :=v_id + 1;
+        END IF;
+    END IF;
+END;
+/
+
+CREATE OR REPLACE TRIGGER trigger_unique_groups_name
+BEFORE INSERT OR UPDATE ON GROUPS
+FOR EACH ROW
+DECLARE
+    v_count NUMBER;
+BEGIN
+    IF UPDATING AND :OLD.NAME = :NEW.NAME THEN
+        RETURN;
+    END IF;
+    
+    SELECT COUNT(*)
+    INTO v_count
     FROM GROUPS
     WHERE NAME = :NEW.NAME;
-    IF existing_name IS NOT NULL THEN
-        RAISE_APPLICATION_ERROR(-20003, 'GROUP WITH THIS NAME ALREADY EXISTS');
+    
+    IF v_count > 0 THEN
+        RAISE_APPLICATION_ERROR(-20003, 'GROUPS WITH THIS ID ALREADY EXISTS');
     END IF;
-EXCEPTION
-    WHEN NO_DATA_FOUND THEN
-        NULL;
 END;
 /

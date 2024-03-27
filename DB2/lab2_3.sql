@@ -1,13 +1,10 @@
-CREATE OR REPLACE TRIGGER CASCADE_DELETE_STUDENTS
+CREATE OR REPLACE TRIGGER trigger_cascade_deletion
 AFTER DELETE ON GROUPS
 FOR EACH ROW
 BEGIN
-    DELETE FROM STUDENTS WHERE GROUP_ID = :OLD.ID;
+    IF :OLD.ID IS NOT NULL THEN
+        DELETE FROM STUDENTS
+        WHERE GROUP_ID = :OLD.ID;
+    END IF;
 END;
 /
-
-Select * from groups;
-delete from groups where id = 1;
-select * from students;
-
-
